@@ -14,6 +14,8 @@ function render() {
   if (spraying) {
     s1.sprayAt(mouseX, mouseY);
   }
+  s1.renderDrops();
+
   requestAnimationFrame(render);
 }
 render();

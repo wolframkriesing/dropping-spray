@@ -1,8 +1,10 @@
 var defaultOptions = {
   color : 'rgb(0, 0, 255)',
   size : 15,
+  max : 20,
   dropper : true,
-  max : 20
+  dropThreshold : 50,
+  dropLengthFactor : 2
 };
 
 function Spray(options) {
@@ -10,15 +12,24 @@ function Spray(options) {
   var color = opts.color || defaultOptions.color;
   var size = opts.size || defaultOptions.size;
   var max = opts.max || defaultOptions.max;
-  var dropper = opts.max || defaultOptions.dropper;
+  var dropper = opts.dropper || defaultOptions.dropper;
+  var dropThreshold = opts.dropThreshold || defaultOptions.dropThreshold;
   var canvas = opts.canvas || document.getElementsById('spray1');
+  var dropFns = [];
   var drops = [];
   var ctx = canvas.getContext('2d');
   initializeDropCounter();
 
   return {
-    sprayAt : sprayAt
+    sprayAt : sprayAt,
+    renderDrops : renderDrops
   };
+
+  function renderDrops() {
+    for (var i = dropFns.length - 1; i >= 0; i--) {
+      dropFns[i](i);
+    }
+  }
 
   function initializeDropCounter() {
     for (var x = 0; x < canvas.width / size; x++) {
@@ -42,7 +53,7 @@ function Spray(options) {
 
     dropFn();
 
-    function dropFn() {
+    function dropFn(idx) {
       var otherDrop;
       var myDrop = drops[x][y];
 
@@ -60,6 +71,9 @@ function Spray(options) {
           count : 0,
           drops : false
         };
+        if (typeof idx !== 'undefined') {
+          dropFns.splice(idx, 1);
+        }
       } else if (y < maxY) {
         myDrop.y = myDrop.y + 1;
         if (myDrop.y > size) {
@@ -71,7 +85,7 @@ function Spray(options) {
           myDrop.count = 0;
           myDrop.drops = false;
         }
-        requestAnimationFrame(dropFn);
+        dropFns.push(dropFn);
       }
     }
   }
@@ -80,8 +94,8 @@ function Spray(options) {
     var xArea = Math.floor(x / size);
     var yArea = Math.floor(y / size);
     if (dropper) {
-      drops[xArea][yArea].count += 1;
-      if (drops[xArea][yArea].count > 50 && !drops[xArea][yArea].drops) {
+      drops[xArea][yArea].count += size;
+      if (drops[xArea][yArea].count > dropThreshold && !drops[xArea][yArea].drops) {
         console.log('start drop at ' + (xArea * size) + ',' + (yArea * size));
         drops[xArea][yArea].drops = true;
         dropAt(xArea, yArea);
