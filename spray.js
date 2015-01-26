@@ -7,7 +7,7 @@ var defaultOptions = {
 
   dropper : true,
   dropThreshold : 50,
-  dropSpeed : 10
+  dropAfter : 3
 };
 
 function Spray(options) {
@@ -18,7 +18,7 @@ function Spray(options) {
   var splatterRadius = getOpt('splatterRadius');
   var dropper = getOpt('dropper');
   var dropThreshold = getOpt('dropThreshold');
-  var dropSpeed = getOpt('dropSpeed');
+  var dropAfter = getOpt('dropAfter');
   var canvas = opts.canvas || document.getElementsById('spray1');
   var dropFns = [];
   var drops = [];
@@ -32,21 +32,31 @@ function Spray(options) {
   };
 
   function getOpt(name) {
-    return opts[name] || defaultOptions[name];
+    var opt = opts[name];
+    if (typeof opt !== 'undefined') {
+      return opt;
+    } else {
+      return defaultOptions[name];
+    }
   }
 
   function renderDrops() {
-    ctx.save();
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.lineCap = 'round';
-    for (var i = dropFns.length - 1; i >= 0; i--) {
-      dropFns[i](i);
+    if (dropper) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineCap = 'round';
+      var amount = dropFns.length - 1;
+      for (var i = amount; i >= 0; i--) {
+        if (dropFns[i]) {
+          dropFns[i](i);
+        }
+      }
+      ctx.stroke();
+      ctx.fill();
+      ctx.restore();
     }
-    ctx.stroke();
-    ctx.fill();
-    ctx.restore();
   }
 
   function initializeDropCounter() {
@@ -57,7 +67,7 @@ function Spray(options) {
           count : 0,
           drops : false,
           width : 0,
-          dropSpeed : dropSpeed
+          dropAfter : dropAfter
         };
       }
     }
@@ -71,25 +81,25 @@ function Spray(options) {
     var maxY = drops[x].length - 1;
     var myDrop = initialDrop;
 
-    dropFn();
+    dropFns.push(createDropFnFor(maxY, x, y, myDrop));
+  }
 
-    function dropFn(idx) {
+  function createDropFnFor(maxY, x, y, myDrop) {
+    return function (idx) {
       var deltaWidth, deltaX, otherDrop;
 
-      myDrop.count = myDrop.count - 1;
+      myDrop.count = myDrop.count - size;
 
       if (myDrop.count <= 0) {
         drops[x][y] = {
           count : 0,
           drops : false
         };
-        if (typeof idx !== 'undefined') {
-          dropFns.splice(idx, 1);
-        }
+        dropFns.splice(idx, 1);
       } else if (y < maxY) {
-        myDrop.dropSpeed = Math.max(1, myDrop.dropSpeed - 1);
+        myDrop.dropAfter = Math.max(1, myDrop.dropAfter - 1);
 
-        if (myDrop.dropSpeed === 1) {
+        if (myDrop.dropAfter === 1) {
           deltaWidth = Math.floor(Math.random() * 3) - 1;
           deltaX = Math.floor(Math.random() * 3) - 1;
 
@@ -111,9 +121,9 @@ function Spray(options) {
           myDrop.count = myDrop.count + size;
         }
 
-        dropFns.push(dropFn);
+        dropFns.splice(idx, 1, createDropFnFor(maxY, x, y, myDrop));
       }
-    }
+    };
   }
 
   function sprayAt(x, y) {
@@ -124,7 +134,7 @@ function Spray(options) {
       drop.count += size;
       if (drop.count > dropThreshold && !drop.drops) {
         drop.drops = true;
-        drop.width = Math.round(Math.random() * size);
+        drop.width = size;
         dropAt(xArea, yArea, drop);
       }
     }

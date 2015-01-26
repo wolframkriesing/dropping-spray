@@ -1,41 +1,70 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Spray = require('./spray.js');
 
-var canvas = document.getElementById('spray1');
+var canvas1 = document.getElementById('spray1');
+var canvas2 = document.getElementById('spray2');
+
 var s1 = new Spray({
-  color : 'rgb(0, 255, 0)',
+  color : 'rgb(255, 255, 0)',
   size : 5,
-  canvas : canvas
+  canvas : canvas1,
+  dropper: false
 });
-var spraying = false;
+var s2 = new Spray({
+  color : 'rgb(0, 0, 255)',
+  size : 5,
+  canvas : canvas2
+});
+
+var spraying1 = false;
+var spraying2 = false;
+
 var mouseX = 0;
 var mouseY = 0;
 
 function render() {
-  if (spraying) {
+  if (spraying1) {
     s1.sprayAt(mouseX, mouseY);
   }
   s1.renderDrops();
+  if (spraying2) {
+    s2.sprayAt(mouseX, mouseY);
+  }
+  s2.renderDrops();
 
   requestAnimationFrame(render);
 }
 render();
 
-canvas.addEventListener('mousedown', function (event) {
+canvas1.addEventListener('mousedown', function (event) {
   event.preventDefault();
   event.stopPropagation();
-  spraying = true;
-  mouseX = event.clientX - canvas.offsetLeft;
-  mouseY = event.clientY - canvas.offsetTop;
+  spraying1 = true;
+  mouseX = event.clientX - canvas1.offsetLeft;
+  mouseY = event.clientY - canvas1.offsetTop;
 });
 
-canvas.addEventListener('mousemove', function (event) {
-  mouseX = event.clientX - canvas.offsetLeft;
-  mouseY = event.clientY - canvas.offsetTop;
+canvas1.addEventListener('mousemove', function (event) {
+  mouseX = event.clientX - canvas1.offsetLeft;
+  mouseY = event.clientY - canvas1.offsetTop;
+});
+
+canvas2.addEventListener('mousedown', function (event) {
+  event.preventDefault();
+  event.stopPropagation();
+  spraying2 = true;
+  mouseX = event.clientX - canvas2.offsetLeft;
+  mouseY = event.clientY - canvas2.offsetTop;
+});
+
+canvas2.addEventListener('mousemove', function (event) {
+  mouseX = event.clientX - canvas2.offsetLeft;
+  mouseY = event.clientY - canvas2.offsetTop;
 });
 
 document.addEventListener('mouseup', function (event) {
-  spraying = false;
+  spraying1 = false;
+  spraying2 = false;
 });
 
 },{"./spray.js":2}],2:[function(require,module,exports){
@@ -48,7 +77,7 @@ var defaultOptions = {
 
   dropper : true,
   dropThreshold : 50,
-  dropSpeed : 10
+  dropAfter : 3
 };
 
 function Spray(options) {
@@ -59,7 +88,7 @@ function Spray(options) {
   var splatterRadius = getOpt('splatterRadius');
   var dropper = getOpt('dropper');
   var dropThreshold = getOpt('dropThreshold');
-  var dropSpeed = getOpt('dropSpeed');
+  var dropAfter = getOpt('dropAfter');
   var canvas = opts.canvas || document.getElementsById('spray1');
   var dropFns = [];
   var drops = [];
@@ -73,21 +102,31 @@ function Spray(options) {
   };
 
   function getOpt(name) {
-    return opts[name] || defaultOptions[name];
+    var opt = opts[name];
+    if (typeof opt !== 'undefined') {
+      return opt;
+    } else {
+      return defaultOptions[name];
+    }
   }
 
   function renderDrops() {
-    ctx.save();
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.lineCap = 'round';
-    for (var i = dropFns.length - 1; i >= 0; i--) {
-      dropFns[i](i);
+    if (dropper) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineCap = 'round';
+      var amount = dropFns.length - 1;
+      for (var i = amount; i >= 0; i--) {
+        if (dropFns[i]) {
+          dropFns[i](i);
+        }
+      }
+      ctx.stroke();
+      ctx.fill();
+      ctx.restore();
     }
-    ctx.stroke();
-    ctx.fill();
-    ctx.restore();
   }
 
   function initializeDropCounter() {
@@ -98,7 +137,7 @@ function Spray(options) {
           count : 0,
           drops : false,
           width : 0,
-          dropSpeed : dropSpeed
+          dropAfter : dropAfter
         };
       }
     }
@@ -112,25 +151,25 @@ function Spray(options) {
     var maxY = drops[x].length - 1;
     var myDrop = initialDrop;
 
-    dropFn();
+    dropFns.push(createDropFnFor(maxY, x, y, myDrop));
+  }
 
-    function dropFn(idx) {
+  function createDropFnFor(maxY, x, y, myDrop) {
+    return function (idx) {
       var deltaWidth, deltaX, otherDrop;
 
-      myDrop.count = myDrop.count - 1;
+      myDrop.count = myDrop.count - size;
 
       if (myDrop.count <= 0) {
         drops[x][y] = {
           count : 0,
           drops : false
         };
-        if (typeof idx !== 'undefined') {
-          dropFns.splice(idx, 1);
-        }
+        dropFns.splice(idx, 1);
       } else if (y < maxY) {
-        myDrop.dropSpeed = Math.max(1, myDrop.dropSpeed - 1);
+        myDrop.dropAfter = Math.max(1, myDrop.dropAfter - 1);
 
-        if (myDrop.dropSpeed === 1) {
+        if (myDrop.dropAfter === 1) {
           deltaWidth = Math.floor(Math.random() * 3) - 1;
           deltaX = Math.floor(Math.random() * 3) - 1;
 
@@ -152,9 +191,9 @@ function Spray(options) {
           myDrop.count = myDrop.count + size;
         }
 
-        dropFns.push(dropFn);
+        dropFns.splice(idx, 1, createDropFnFor(maxY, x, y, myDrop));
       }
-    }
+    };
   }
 
   function sprayAt(x, y) {
@@ -165,7 +204,7 @@ function Spray(options) {
       drop.count += size;
       if (drop.count > dropThreshold && !drop.drops) {
         drop.drops = true;
-        drop.width = Math.round(Math.random() * size);
+        drop.width = size;
         dropAt(xArea, yArea, drop);
       }
     }
