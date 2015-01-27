@@ -28,7 +28,8 @@ function Spray(options) {
 
   return {
     sprayAt : sprayAt,
-    renderDrops : renderDrops
+    renderDrops : renderDrops,
+    resetDrops : initializeDropCounter
   };
 
   function getOpt(name) {

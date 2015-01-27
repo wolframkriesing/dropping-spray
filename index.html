@@ -4,19 +4,26 @@
   <meta charset="UTF-8">
   <title>Dropping spray</title>
   <style type="text/css">
-    .spray {
+    body {
+      padding: 0;
+      height: 100%;
+    }
 
+    #spray1 {
+      height: 400px;
+    }
+
+    canvas {
+      background-color: #eee;
     }
   </style>
 </head>
 <body>
-<h1>Dropping spray</h1>
-Try it out yourself :)
-<div class="spray"><h2>Simple spray</h2>
+<header>
+  <h1>Dropping spray</h1>
+</header>
+<div class="spray"><h2>Try it out yourself :)</h2>
   <canvas id="spray1"></canvas>
-</div>
-<div class="spray"><h2>Spray with drops</h2>
-  <canvas id="spray2"></canvas>
 </div>
 <script src="bundle.js"></script>
 </body>

@@ -2,22 +2,18 @@
 var Spray = require('./spray.js');
 
 var canvas1 = document.getElementById('spray1');
-var canvas2 = document.getElementById('spray2');
+
+canvas1.height = document.getElementById('spray1').offsetHeight;
+canvas1.width = (window.innerWidth / 2) - 60;
 
 var s1 = new Spray({
-  color : 'rgb(255, 255, 0)',
-  size : 5,
-  canvas : canvas1,
-  dropper: false
-});
-var s2 = new Spray({
   color : 'rgb(0, 0, 255)',
   size : 5,
-  canvas : canvas2
+  canvas : canvas1,
+  dropper : true
 });
 
 var spraying1 = false;
-var spraying2 = false;
 
 var mouseX = 0;
 var mouseY = 0;
@@ -27,45 +23,40 @@ function render() {
     s1.sprayAt(mouseX, mouseY);
   }
   s1.renderDrops();
-  if (spraying2) {
-    s2.sprayAt(mouseX, mouseY);
-  }
-  s2.renderDrops();
 
   requestAnimationFrame(render);
 }
 render();
 
-canvas1.addEventListener('mousedown', function (event) {
-  event.preventDefault();
-  event.stopPropagation();
+var startEventCanvas1 = downEvent(canvas1, function () {
   spraying1 = true;
-  mouseX = event.clientX - canvas1.offsetLeft;
-  mouseY = event.clientY - canvas1.offsetTop;
 });
+var moveEventCanvas1 = downEvent(canvas1);
 
-canvas1.addEventListener('mousemove', function (event) {
-  mouseX = event.clientX - canvas1.offsetLeft;
-  mouseY = event.clientY - canvas1.offsetTop;
-});
+canvas1.addEventListener('mousedown', startEventCanvas1);
+canvas1.addEventListener('mousemove', moveEventCanvas1);
+canvas1.addEventListener('touchstart', startEventCanvas1);
+canvas1.addEventListener('touchmove', moveEventCanvas1);
 
-canvas2.addEventListener('mousedown', function (event) {
-  event.preventDefault();
-  event.stopPropagation();
-  spraying2 = true;
-  mouseX = event.clientX - canvas2.offsetLeft;
-  mouseY = event.clientY - canvas2.offsetTop;
-});
+document.addEventListener('mouseup', stopSpraying);
+document.addEventListener('touchend', stopSpraying);
 
-canvas2.addEventListener('mousemove', function (event) {
-  mouseX = event.clientX - canvas2.offsetLeft;
-  mouseY = event.clientY - canvas2.offsetTop;
-});
+function downEvent(canvas, cb) {
+  return function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    mouseX = event.clientX - canvas.offsetLeft;
+    mouseY = event.clientY - canvas.offsetTop;
+    if (cb) {
+      cb();
+    }
+  };
+}
 
-document.addEventListener('mouseup', function (event) {
+function stopSpraying() {
   spraying1 = false;
-  spraying2 = false;
-});
+  s1.resetDrops();
+}
 
 },{"./spray.js":2}],2:[function(require,module,exports){
 var defaultOptions = {
@@ -98,7 +89,8 @@ function Spray(options) {
 
   return {
     sprayAt : sprayAt,
-    renderDrops : renderDrops
+    renderDrops : renderDrops,
+    resetDrops : initializeDropCounter
   };
 
   function getOpt(name) {
