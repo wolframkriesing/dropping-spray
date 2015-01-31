@@ -7,6 +7,8 @@ canvas.height = document.getElementById('spray1').offsetHeight;
 canvas.width = window.innerWidth - 30;
 
 var form = document.getElementById('options');
+var autoSpraySpeed = parseInt(form.autoSpraySpeed.value);
+
 form.red.addEventListener('change', resetSpray);
 form.green.addEventListener('change', resetSpray);
 form.blue.addEventListener('change', resetSpray);
@@ -16,6 +18,11 @@ form.splatterRadius.addEventListener('change', resetSpray);
 form.drops.addEventListener('change', resetSpray);
 form.dropThreshold.addEventListener('change', resetSpray);
 form.dropSpeed.addEventListener('change', resetSpray);
+form.autoSpraySpeed.addEventListener('change', function() {
+  autoSpraySpeed = parseInt(form.autoSpraySpeed.value);
+});
+
+document.getElementById('randomColor').addEventListener('click', randomizeColor);
 document.getElementById('autoSpray').addEventListener('click', function () {
   resetSpray();
   var x = 0;
@@ -24,15 +31,23 @@ document.getElementById('autoSpray').addEventListener('click', function () {
   sprayFromLeftToRight();
 
   function sprayFromLeftToRight() {
-    console.log('spraying at ' + x + ', ' + y + ' -- ' + canvas.height);
-    x = x + Math.round(Math.random());
+    x = x + Math.round(Math.random() * Math.max(0, autoSpraySpeed));
     y = Math.max(0, Math.min(canvas.height, (y + Math.floor(Math.random() * 3) - 1)));
     if (x < canvas.width) {
       spray.sprayAt(x, y);
       requestAnimationFrame(sprayFromLeftToRight);
+    } else {
+      console.log('auto spray done');
     }
   }
 });
+
+function randomizeColor() {
+  form.red.value = Math.round(Math.random() * 255);
+  form.green.value = Math.round(Math.random() * 255);
+  form.blue.value = Math.round(Math.random() * 255);
+  resetSpray();
+}
 
 function resetSpray() {
   spray = createSpray();
