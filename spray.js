@@ -7,7 +7,7 @@ var defaultOptions = {
 
   dropper : true,
   dropThreshold : 50,
-  dropAfter : 3
+  dropSpeed : 3
 };
 
 function Spray(options) {
@@ -18,8 +18,8 @@ function Spray(options) {
   var splatterRadius = getOpt('splatterRadius');
   var dropper = getOpt('dropper');
   var dropThreshold = getOpt('dropThreshold');
-  var dropAfter = getOpt('dropAfter');
-  var canvas = opts.canvas || document.getElementsById('spray1');
+  var dropSpeed = getOpt('dropSpeed');
+  var canvas = opts.canvas;
   var dropFns = [];
   var drops = [];
   var ctx = canvas.getContext('2d');
@@ -68,7 +68,7 @@ function Spray(options) {
           count : 0,
           drops : false,
           width : 0,
-          dropAfter : dropAfter
+          dropSpeed : dropSpeed
         };
       }
     }
@@ -89,18 +89,13 @@ function Spray(options) {
     return function (idx) {
       var deltaWidth, deltaX, otherDrop;
 
-      myDrop.count = myDrop.count - size;
-
       if (myDrop.count <= 0) {
-        drops[x][y] = {
-          count : 0,
-          drops : false
-        };
+        myDrop.count = 0;
         dropFns.splice(idx, 1);
       } else if (y < maxY) {
-        myDrop.dropAfter = Math.max(1, myDrop.dropAfter - 1);
+        myDrop.dropSpeed = Math.max(1, myDrop.dropSpeed - myDrop.width);
 
-        if (myDrop.dropAfter === 1) {
+        if (myDrop.dropSpeed === 1) {
           deltaWidth = Math.floor(Math.random() * 3) - 1;
           deltaX = Math.floor(Math.random() * 3) - 1;
 
@@ -110,13 +105,15 @@ function Spray(options) {
 
           y = y + 1;
           otherDrop = drops[x][y];
+          if (!otherDrop.drops) {
+            otherDrop.drops = true;
+            myDrop.count = myDrop.count - myDrop.width;
+          }
           otherDrop.count += myDrop.count;
-          otherDrop.drops = true;
           otherDrop.width = Math.max(Math.max(1, myDrop.width + deltaWidth), otherDrop.width);
           ctx.lineTo((x * size) + deltaX, y * size);
 
           myDrop.count = 0;
-          myDrop.drops = false;
           myDrop = otherDrop;
         } else {
           myDrop.count = myDrop.count + size;
@@ -128,12 +125,12 @@ function Spray(options) {
   }
 
   function sprayAt(x, y) {
-    var xArea = Math.floor(x / size);
-    var yArea = Math.floor(y / size);
+    var xArea = Math.max(0, Math.floor(x / size));
+    var yArea = Math.max(0, Math.floor(y / size));
     var drop = drops[xArea][yArea];
     if (dropper) {
       drop.count += size;
-      if (drop.count > dropThreshold && !drop.drops) {
+      if (drop.count > dropThreshold) {
         drop.drops = true;
         drop.width = size;
         dropAt(xArea, yArea, drop);

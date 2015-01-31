@@ -25,6 +25,20 @@
 <div class="spray"><h2>Try it out yourself :)</h2>
   <canvas id="spray1"></canvas>
 </div>
+<form id="options">
+  <div><label>Color (R) <input type="number" name="red" value="255"/></label></div>
+  <div><label>Color (G) <input type="number" name="green" value="0"/></label></div>
+  <div><label>Color (B) <input type="number" name="blue" value="0"/></label></div>
+  <div><label>Minimum size <input type="number" name="size" value="5"/></label></div>
+
+  <div><label>Splatter amount <input type="number" name="splatterAmount" value="40"/></label></div>
+  <div><label>Splatter radius <input type="number" name="splatterRadius" value="50"/></label></div>
+
+  <div><label>Dropping? <input type="checkbox" name="drops" value="1" checked="checked"/></label></div>
+  <div><label>Drop threshold <input type="number" name="dropThreshold" value="50"/></label></div>
+  <div><label>Drop speed <input type="number" name="dropSpeed" value="3"/></label></div>
+  <div><button id="autoSpray" type="button">Auto spray!</button></div>
+</form>
 <script src="bundle.js"></script>
 </body>
 </html>
