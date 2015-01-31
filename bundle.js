@@ -18,7 +18,7 @@ form.splatterRadius.addEventListener('change', resetSpray);
 form.drops.addEventListener('change', resetSpray);
 form.dropThreshold.addEventListener('change', resetSpray);
 form.dropSpeed.addEventListener('change', resetSpray);
-form.autoSpraySpeed.addEventListener('change', function() {
+form.autoSpraySpeed.addEventListener('change', function () {
   autoSpraySpeed = parseInt(form.autoSpraySpeed.value);
 });
 
@@ -32,7 +32,7 @@ document.getElementById('autoSpray').addEventListener('click', function () {
 
   function sprayFromLeftToRight() {
     x = x + Math.round(Math.random() * Math.max(0, autoSpraySpeed));
-    y = Math.max(0, Math.min(canvas.height, (y + Math.floor(Math.random() * 3) - 1)));
+    y = Math.max(0, Math.min(canvas.height - 1, (y + Math.floor(Math.random() * 3) - 1)));
     if (x < canvas.width) {
       spray.sprayAt(x, y);
       requestAnimationFrame(sprayFromLeftToRight);
@@ -77,19 +77,24 @@ var spraying = false;
 
 var mouseX = 0;
 var mouseY = 0;
+var requestsAnimFrame = false;
 
 function render() {
   if (spraying) {
     spray.sprayAt(mouseX, mouseY);
   }
-  spray.renderDrops();
+  requestsAnimFrame = spray.renderDrops() || spraying;
 
-  requestAnimationFrame(render);
+  if (requestsAnimFrame) {
+    requestAnimationFrame(render);
+  }
 }
 render();
 
 var startEventCanvas = downEvent(canvas, function () {
   spraying = true;
+  requestsAnimFrame = true;
+  render();
 });
 var moveEventCanvas = downEvent(canvas);
 
@@ -105,8 +110,15 @@ function downEvent(canvas, cb) {
   return function (event) {
     event.preventDefault();
     event.stopPropagation();
-    mouseX = event.clientX - canvas.offsetLeft;
-    mouseY = event.clientY - canvas.offsetTop;
+    var touchList = event.touches;
+    if (touchList) {
+      var touch = touchList[0];
+      mouseX = parseInt(touch.clientX) - canvas.offsetLeft;
+      mouseY = parseInt(touch.clientY) - canvas.offsetTop;
+    } else {
+      mouseX = event.clientX - canvas.offsetLeft;
+      mouseY = event.clientY - canvas.offsetTop;
+    }
     if (cb) {
       cb();
     }
@@ -178,6 +190,11 @@ function Spray(options) {
       ctx.stroke();
       ctx.fill();
       ctx.restore();
+    }
+    if (amount > 0) {
+      return true;
+    } else {
+      return false;
     }
   }
 
