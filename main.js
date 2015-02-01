@@ -67,7 +67,6 @@ function createSpray() {
     dropSpeed : parseInt(form.dropSpeed.value)
   };
 
-  console.log(options);
   return new Spray(options);
 }
 var spray = createSpray();
