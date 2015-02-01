@@ -35,6 +35,7 @@ document.getElementById('autoSpray').addEventListener('click', function () {
     y = Math.max(0, Math.min(canvas.height - 1, (y + Math.floor(Math.random() * 3) - 1)));
     if (x < canvas.width) {
       spray.sprayAt(x, y);
+      spray.renderDrops();
       requestAnimationFrame(sprayFromLeftToRight);
     } else {
       console.log('auto spray done');
@@ -68,7 +69,6 @@ function createSpray() {
     dropSpeed : parseInt(form.dropSpeed.value)
   };
 
-  console.log(options);
   return new Spray(options);
 }
 var spray = createSpray();
