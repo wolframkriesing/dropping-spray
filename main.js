@@ -112,11 +112,11 @@ function downEvent(canvas, cb) {
     var touchList = event.touches;
     if (touchList) {
       var touch = touchList[0];
-      mouseX = parseInt(touch.clientX) - canvas.offsetLeft;
-      mouseY = parseInt(touch.clientY) - canvas.offsetTop;
+      mouseX = parseInt(touch.pageX) - canvas.offsetLeft;
+      mouseY = parseInt(touch.pageY) - canvas.offsetTop;
     } else {
-      mouseX = event.clientX - canvas.offsetLeft;
-      mouseY = event.clientY - canvas.offsetTop;
+      mouseX = event.pageX - canvas.offsetLeft;
+      mouseY = event.pageY - canvas.offsetTop;
     }
     if (cb) {
       cb();
