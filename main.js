@@ -70,7 +70,8 @@ function createSpray() {
 
   return new Spray(options);
 }
-var spray = createSpray();
+var spray;
+randomizeColor();
 
 var spraying = false;
 
