@@ -1,9 +1,35 @@
 var Spray = require('./spray.js');
 
+// Options
+(function () {
+
+  var hider = document.getElementById('options-hider');
+  var options = document.getElementById('options-content');
+
+  hider.addEventListener('touchstart', toggleOptions);
+  hider.addEventListener('click', toggleOptions);
+
+  var isHidden = false;
+
+  function toggleOptions() {
+    isHidden = !isHidden;
+    if (isHidden) {
+      options.style.display = 'none';
+      hider.innerHTML = 'open';
+      hider.classList.add('open');
+    } else {
+      options.style.display = 'block';
+      hider.innerHTML = 'close';
+      hider.classList.remove('open');
+    }
+  }
+
+}());
+
 var canvas = document.getElementById('spray1');
 
 canvas.height = document.getElementById('spray1').offsetHeight;
-canvas.width = window.innerWidth - 30;
+canvas.width = window.innerWidth;
 
 var form = document.getElementById('options');
 var autoSpraySpeed = parseInt(form.autoSpraySpeed.value);

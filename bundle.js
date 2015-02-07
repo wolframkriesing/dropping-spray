@@ -1,10 +1,36 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Spray = require('./spray.js');
 
+// Options
+(function () {
+
+  var hider = document.getElementById('options-hider');
+  var options = document.getElementById('options-content');
+
+  hider.addEventListener('touchstart', toggleOptions);
+  hider.addEventListener('click', toggleOptions);
+
+  var isHidden = false;
+
+  function toggleOptions() {
+    isHidden = !isHidden;
+    if (isHidden) {
+      options.style.display = 'none';
+      hider.innerHTML = 'open';
+      hider.classList.add('open');
+    } else {
+      options.style.display = 'block';
+      hider.innerHTML = 'close';
+      hider.classList.remove('open');
+    }
+  }
+
+}());
+
 var canvas = document.getElementById('spray1');
 
 canvas.height = document.getElementById('spray1').offsetHeight;
-canvas.width = window.innerWidth - 30;
+canvas.width = window.innerWidth;
 
 var form = document.getElementById('options');
 var autoSpraySpeed = parseInt(form.autoSpraySpeed.value);
