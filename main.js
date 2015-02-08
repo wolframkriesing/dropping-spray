@@ -15,7 +15,7 @@ var Spray = require('./spray.js');
     isHidden = !isHidden;
     if (isHidden) {
       options.style.display = 'none';
-      hider.innerHTML = 'open';
+      hider.innerHTML = 'Open options';
       hider.classList.add('open');
     } else {
       options.style.display = 'block';
@@ -80,21 +80,27 @@ function resetSpray() {
 }
 
 function createSpray() {
-  var r = parseInt(form.red.value);
-  var g = parseInt(form.green.value);
-  var b = parseInt(form.blue.value);
+  var r = checkedValue(form.red, 0, 255);
+  var g = checkedValue(form.green, 0, 255);
+  var b = checkedValue(form.blue, 0, 255);
   var options = {
     color : 'rgb(' + r + ',' + g + ',' + b + ')',
     canvas : canvas,
-    size : parseInt(form.size.value),
-    splatterAmount : parseInt(form.splatterAmount.value),
-    splatterRadius : parseInt(form.splatterRadius.value),
+    size : checkedValue(form.size, 1, Math.min(canvas.height, canvas.width)),
+    splatterAmount : checkedValue(form.splatterAmount, 0, Infinity),
+    splatterRadius : checkedValue(form.splatterRadius, 0, Infinity),
     dropper : !!form.drops.checked,
-    dropThreshold : parseInt(form.dropThreshold.value),
-    dropSpeed : parseInt(form.dropSpeed.value)
+    dropThreshold : checkedValue(form.dropThreshold, 0, Infinity),
+    dropSpeed : checkedValue(form.dropSpeed, 0, Infinity)
   };
 
   return new Spray(options);
+
+  function checkedValue(field, min, max) {
+    var value = Math.max(min, Math.min(max, parseInt(field.value)));
+    field.value = value;
+    return value;
+  }
 }
 var spray;
 randomizeColor();
