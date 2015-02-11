@@ -58,7 +58,7 @@ function Spray(options) {
       ctx.fill();
       ctx.restore();
     }
-    if (amount > 0) {
+    if (amount >= 0) {
       return true;
     } else {
       return false;

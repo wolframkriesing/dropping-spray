@@ -16,7 +16,7 @@ var Spray = require('./spray.js');
     isHidden = !isHidden;
     if (isHidden) {
       options.style.display = 'none';
-      hider.innerHTML = 'open';
+      hider.innerHTML = 'Open options';
       hider.classList.add('open');
     } else {
       options.style.display = 'block';
@@ -224,7 +224,7 @@ function Spray(options) {
       ctx.fill();
       ctx.restore();
     }
-    if (amount > 0) {
+    if (amount >= 0) {
       return true;
     } else {
       return false;
