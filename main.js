@@ -6,7 +6,6 @@ var Spray = require('./spray.js');
   var hider = document.getElementById('options-hider');
   var options = document.getElementById('options-content');
 
-  hider.addEventListener('touchstart', toggleOptions);
   hider.addEventListener('click', toggleOptions);
 
   var isHidden = false;
