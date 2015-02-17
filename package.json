@@ -1,0 +1,26 @@
+{
+  "name": "dropping-spray",
+  "version": "0.1.0",
+  "description": "A spray that drops",
+  "scripts": {
+    "build": "browserify main.js -o bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Narigo/dropping-spray.git"
+  },
+  "keywords": [
+    "spray",
+    "dropping",
+    "canvas"
+  ],
+  "author": "Campudus GmbH",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Narigo/dropping-spray/issues"
+  },
+  "homepage": "https://github.com/Narigo/dropping-spray",
+  "devDependencies": {
+    "browserify": "^8.1.3"
+  }
+}
