@@ -139,6 +139,7 @@ function setupForm() {
   });
 
   document.getElementById('clearCanvas').addEventListener('click', function() {
+    resetSpray();
     var ctx = canvas.getContext('2d');
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
