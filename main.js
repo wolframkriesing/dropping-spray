@@ -1,3 +1,4 @@
+var optionsDialog = require('./src/options-dialog');
 var Spray = require('./spray.js');
 var canvas = document.getElementById('spray1');
 
@@ -28,7 +29,7 @@ canvas.addEventListener('touchmove', moveEventCanvas);
 document.addEventListener('mouseup', stopSpraying);
 document.addEventListener('touchend', stopSpraying);
 
-setupOptions();
+optionsDialog.setupOptions();
 setupForm();
 
 resetSpray();
@@ -95,30 +96,6 @@ function downEvent(canvas, cb) {
       cb();
     }
   };
-}
-
-function setupOptions() {
-
-  var hider = document.getElementById('options-hider');
-  var options = document.getElementById('options-content');
-
-  hider.addEventListener('click', toggleOptions);
-
-  var isHidden = false;
-
-  function toggleOptions() {
-    isHidden = !isHidden;
-    if (isHidden) {
-      options.style.display = 'none';
-      hider.innerHTML = 'Open options';
-      hider.classList.add('open');
-    } else {
-      options.style.display = 'block';
-      hider.innerHTML = 'close';
-      hider.classList.remove('open');
-    }
-  }
-
 }
 
 function setupForm() {
