@@ -30,7 +30,7 @@ document.addEventListener('mouseup', stopSpraying);
 document.addEventListener('touchend', stopSpraying);
 
 optionsDialog.setupOptions();
-setupForm();
+optionsDialog.setupForm(form, canvas, resetSpray);
 
 resetSpray();
 
@@ -96,62 +96,4 @@ function downEvent(canvas, cb) {
       cb();
     }
   };
-}
-
-function setupForm() {
-  var autoSpraySpeed = parseInt(form.autoSpraySpeed.value);
-
-  form.red.addEventListener('change', resetSpray);
-  form.green.addEventListener('change', resetSpray);
-  form.blue.addEventListener('change', resetSpray);
-  form.size.addEventListener('change', resetSpray);
-  form.splatterAmount.addEventListener('change', resetSpray);
-  form.splatterRadius.addEventListener('change', resetSpray);
-  form.drops.addEventListener('change', resetSpray);
-  form.dropThreshold.addEventListener('change', resetSpray);
-  form.dropSpeed.addEventListener('change', resetSpray);
-  form.autoSpraySpeed.addEventListener('change', function () {
-    autoSpraySpeed = parseInt(form.autoSpraySpeed.value);
-  });
-
-  document.getElementById('clearCanvas').addEventListener('click', function() {
-    resetSpray();
-    var ctx = canvas.getContext('2d');
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
-  });
-
-  document.getElementById('randomColor').addEventListener('click', function() {
-    randomizeColor();
-    resetSpray();
-  });
-  document.getElementById('autoSpray').addEventListener('click', function () {
-    resetSpray();
-    var x = 0;
-    var y = Math.floor(Math.random() * canvas.height);
-
-    sprayFromLeftToRight();
-
-    function sprayFromLeftToRight() {
-      x = x + Math.round(Math.random() * Math.max(0, autoSpraySpeed));
-      y = Math.max(0, Math.min(canvas.height - 1, (y + Math.floor(Math.random() * 3) - 1)));
-      if (x < canvas.width) {
-        spray.sprayAt(x, y);
-        spray.renderDrops();
-        requestAnimationFrame(sprayFromLeftToRight);
-      } else {
-        console.log('auto spray done');
-      }
-    }
-  });
-
-  function randomizeColor() {
-    form.red.value = Math.round(Math.random() * 255);
-    form.green.value = Math.round(Math.random() * 255);
-    form.blue.value = Math.round(Math.random() * 255);
-  }
-
-  randomizeColor();
 }
