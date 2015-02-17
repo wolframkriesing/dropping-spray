@@ -137,6 +137,14 @@ function setupForm() {
     autoSpraySpeed = parseInt(form.autoSpraySpeed.value);
   });
 
+  document.getElementById('clearCanvas').addEventListener('click', function() {
+    var ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  });
+
   document.getElementById('randomColor').addEventListener('click', function() {
     randomizeColor();
     resetSpray();
